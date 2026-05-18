@@ -1,0 +1,32 @@
+map "$remote_addr:$http_x_forwarded_for" $forwarded_for_chain {
+    "~^172\.31\.240\.(11|12|13):(.+)$" "$2, ${SELF_IP}";
+    default "$remote_addr, ${SELF_IP}";
+}
+
+server {
+    listen 80;
+    server_name _;
+
+    resolver 127.0.0.11 valid=10s ipv6=off;
+
+    add_header X-Nginx-Hop "${SELF_NAME}" always;
+
+    location = / {
+        return 200 "Use /app for direct app proxying or /via/nginx2/via/nginx3/app to build a proxy chain.\n";
+    }
+
+    location = /app {
+        proxy_pass http://app:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $forwarded_for_chain;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location ~ ^/via/(nginx[123])(?<next_path>/.*)$ {
+        set $next_proxy $1;
+        proxy_pass http://$next_proxy$next_path$is_args$args;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $forwarded_for_chain;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}

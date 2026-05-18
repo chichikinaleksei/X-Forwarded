@@ -1,0 +1,57 @@
+services:
+  app:
+    build:
+      context: ./app
+    container_name: xff-app
+    networks:
+      xff-lab:
+        ipv4_address: 172.31.240.20
+
+  nginx1:
+    image: nginx:1.27-alpine
+    container_name: xff-nginx1
+    environment:
+      SELF_NAME: nginx1
+      SELF_IP: 172.31.240.11
+    ports:
+      - "8081:80"
+    volumes:
+      - ./nginx/default.conf.template:/etc/nginx/templates/default.conf.template:ro
+    networks:
+      xff-lab:
+        ipv4_address: 172.31.240.11
+
+  nginx2:
+    image: nginx:1.27-alpine
+    container_name: xff-nginx2
+    environment:
+      SELF_NAME: nginx2
+      SELF_IP: 172.31.240.12
+    ports:
+      - "8082:80"
+    volumes:
+      - ./nginx/default.conf.template:/etc/nginx/templates/default.conf.template:ro
+    networks:
+      xff-lab:
+        ipv4_address: 172.31.240.12
+
+  nginx3:
+    image: nginx:1.27-alpine
+    container_name: xff-nginx3
+    environment:
+      SELF_NAME: nginx3
+      SELF_IP: 172.31.240.13
+    ports:
+      - "8083:80"
+    volumes:
+      - ./nginx/default.conf.template:/etc/nginx/templates/default.conf.template:ro
+    networks:
+      xff-lab:
+        ipv4_address: 172.31.240.13
+
+networks:
+  xff-lab:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.31.240.0/24
