@@ -1,9 +1,5 @@
 # X-Forwarded-For nginx chain lab
 
-Тестовый стенд для задания на позицию DevOps.
-
-В составе стенда:
-
 - `nginx1`, `nginx2`, `nginx3` в режиме reverse proxy;
 - простое HTTP-приложение на Python, которое выводит полученный `X-Forwarded-For`;
 - статическая docker-сеть, чтобы nginx могли доверять только IP друг друга;
